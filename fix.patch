@@ -1,0 +1,48 @@
+diff --git a/src/Forms/Container.php b/src/Forms/Container.php
+index e7c3a94..9ed1796 100644
+--- a/src/Forms/Container.php
++++ b/src/Forms/Container.php
+@@ -24,7 +24,9 @@
+  */
+ class Container extends Nette\ComponentModel\Container implements \ArrayAccess
+ {
+-	use Nette\SmartObject;
++	use Nette\SmartObject {
++		__call as private smartObjectCall;
++	}
+ 	use Nette\ComponentModel\ArrayAccess;
+ 
+ 	public const Array = 'array';
+@@ -629,7 +631,7 @@ public function __call(string $name, array $args)
+ 			return (self::$extMethods[$name])($this, ...$args);
+ 		}
+ 
+-		Nette\Utils\ObjectHelpers::strictCall(static::class, $name);
++		return $this->smartObjectCall($name, $args);
+ 	}
+ 
+ 
+diff --git a/src/Forms/Controls/BaseControl.php b/src/Forms/Controls/BaseControl.php
+index fa616e5..bbd2f1a 100644
+--- a/src/Forms/Controls/BaseControl.php
++++ b/src/Forms/Controls/BaseControl.php
+@@ -39,7 +39,9 @@
+  */
+ abstract class BaseControl extends Nette\ComponentModel\Component implements Control
+ {
+-	use Nette\SmartObject;
++	use Nette\SmartObject {
++		__call as private smartObjectCall;
++	}
+ 
+ 	public static string $idMask = 'frm-%s';
+ 
+@@ -572,7 +574,7 @@ public function __call(string $name, array $args)
+ 			$class = get_parent_class($class);
+ 		} while ($class);
+ 
+-		Nette\Utils\ObjectHelpers::strictCall(static::class, $name);
++		return $this->smartObjectCall($name, $args);
+ 	}
+ 
+ 
